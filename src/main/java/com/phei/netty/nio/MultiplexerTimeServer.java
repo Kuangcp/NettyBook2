@@ -34,19 +34,17 @@ public class MultiplexerTimeServer implements Runnable {
 
     private Selector selector;
 
-    private ServerSocketChannel servChannel;
-
     private volatile boolean stop;
 
     /**
      * 初始化多路复用器、绑定监听端口
      *
-     * @param port
+     * @param port 端口
      */
     public MultiplexerTimeServer(int port) {
         try {
             selector = Selector.open();
-            servChannel = ServerSocketChannel.open();
+            ServerSocketChannel servChannel = ServerSocketChannel.open();
             servChannel.configureBlocking(false);
             servChannel.socket().bind(new InetSocketAddress(port), 1024);
             servChannel.register(selector, SelectionKey.OP_ACCEPT);
@@ -61,11 +59,6 @@ public class MultiplexerTimeServer implements Runnable {
         this.stop = true;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see java.lang.Runnable#run()
-     */
     @Override
     public void run() {
         while (!stop) {
@@ -73,7 +66,7 @@ public class MultiplexerTimeServer implements Runnable {
                 selector.select(1000);
                 Set<SelectionKey> selectedKeys = selector.selectedKeys();
                 Iterator<SelectionKey> it = selectedKeys.iterator();
-                SelectionKey key = null;
+                SelectionKey key;
                 while (it.hasNext()) {
                     key = it.next();
                     it.remove();
@@ -91,14 +84,14 @@ public class MultiplexerTimeServer implements Runnable {
                 t.printStackTrace();
             }
         }
-
         // 多路复用器关闭后，所有注册在上面的Channel和Pipe等资源都会被自动去注册并关闭，所以不需要重复释放资源
-        if (selector != null)
+        if (selector != null) {
             try {
                 selector.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
     }
 
     private void handleInput(SelectionKey key) throws IOException {
@@ -129,13 +122,16 @@ public class MultiplexerTimeServer implements Runnable {
                             .equalsIgnoreCase(body) ? new java.util.Date(
                             System.currentTimeMillis()).toString()
                             : "BAD ORDER";
+                    if("STOP".equalsIgnoreCase(body)){
+                        stop();
+                    }
                     doWrite(sc, currentTime);
                 } else if (readBytes < 0) {
                     // 对端链路关闭
                     key.cancel();
                     sc.close();
-                } else
-                    ; // 读到0字节，忽略
+                }
+                // 读到0字节，忽略
             }
         }
     }
