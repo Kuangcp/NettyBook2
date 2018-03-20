@@ -57,8 +57,10 @@ public class TimeServer {
 
     private class ChildChannelHandler extends ChannelInitializer<SocketChannel> {
         @Override
-        protected void initChannel(SocketChannel arg0) throws Exception {
-            arg0.pipeline().addLast(new LineBasedFrameDecoder(1024));
+        protected void initChannel(SocketChannel arg0) {
+            // 在此管道的最后位置插入通道处理程序。
+            // 在原来的客户端的处理类 前加上了两个解码器 一个处理粘包, 一个处理String的解码
+            arg0.pipeline().addLast(new LineBasedFrameDecoder(1024)); // 并且设置单行最大长度
             arg0.pipeline().addLast(new StringDecoder());
             arg0.pipeline().addLast(new TimeServerHandler());
         }

@@ -43,8 +43,8 @@ public class TimeClient {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) {
-                            ch.pipeline().addLast(
-                                    new LineBasedFrameDecoder(1024));
+                            // 与服务端类似, 增加两个解码器,
+                            ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
                             ch.pipeline().addLast(new StringDecoder());
                             ch.pipeline().addLast(new TimeClientHandler());
                         }

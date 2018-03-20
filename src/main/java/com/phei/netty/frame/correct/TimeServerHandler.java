@@ -30,11 +30,12 @@ public class TimeServerHandler extends ChannelHandlerAdapter {
     private int counter;
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg)
-            throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        // 以下两行 简化了String的解码, 也没有考虑粘包问题
         String body = (String) msg;
         System.out.println("The time server receive order : " + body
                 + " ; the counter is : " + ++counter);
+
         String currentTime = "QUERY TIME ORDER".equalsIgnoreCase(body) ? new java.util.Date(
                 System.currentTimeMillis()).toString() : "BAD ORDER";
         currentTime = currentTime + System.getProperty("line.separator");

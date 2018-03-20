@@ -43,6 +43,7 @@ public class TimeClient {
                         public void initChannel(SocketChannel ch)
                                 throws Exception {
                             ch.pipeline().addLast(new TimeClientHandler());
+                            System.out.println("添加一个管道");
                         }
                     });
 
@@ -71,5 +72,6 @@ public class TimeClient {
             }
         }
         new TimeClient().connect(port, "127.0.0.1");
+        System.out.println("断开");
     }
 }

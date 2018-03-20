@@ -1,12 +1,12 @@
 /*
  * Copyright 2013-2018 Lilinfeng.
- *  
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- *  
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,8 +20,8 @@ import java.nio.ByteBuffer;
 
 /**
  * @author Administrator
- * @date 2014年2月23日
  * @version 1.0
+ * @date 2014年2月23日
  */
 public class UserInfo implements Serializable {
 
@@ -35,68 +35,66 @@ public class UserInfo implements Serializable {
     private int userID;
 
     public UserInfo buildUserName(String userName) {
-	this.userName = userName;
-	return this;
+        this.userName = userName;
+        return this;
     }
 
     public UserInfo buildUserID(int userID) {
-	this.userID = userID;
-	return this;
+        this.userID = userID;
+        return this;
     }
 
     /**
      * @return the userName
      */
     public final String getUserName() {
-	return userName;
+        return userName;
     }
 
     /**
-     * @param userName
-     *            the userName to set
+     * @param userName the userName to set
      */
     public final void setUserName(String userName) {
-	this.userName = userName;
+        this.userName = userName;
     }
 
     /**
      * @return the userID
      */
     public final int getUserID() {
-	return userID;
+        return userID;
     }
 
     /**
-     * @param userID
-     *            the userID to set
+     * @param userID the userID to set
      */
     public final void setUserID(int userID) {
-	this.userID = userID;
+        this.userID = userID;
     }
 
     public byte[] codeC() {
-	ByteBuffer buffer = ByteBuffer.allocate(1024);
-	byte[] value = this.userName.getBytes();
-	buffer.putInt(value.length);
-	buffer.put(value);
-	buffer.putInt(this.userID);
-	buffer.flip();
-	value = null;
-	byte[] result = new byte[buffer.remaining()];
-	buffer.get(result);
-	return result;
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        byte[] value = this.userName.getBytes();
+        buffer.putInt(value.length);
+        buffer.put(value);
+        buffer.putInt(this.userID);
+        buffer.flip();
+        byte[] result = new byte[buffer.remaining()];
+        buffer.get(result);
+        return result;
     }
 
+    // 测试性能
     public byte[] codeC(ByteBuffer buffer) {
-	buffer.clear();
-	byte[] value = this.userName.getBytes();
-	buffer.putInt(value.length);
-	buffer.put(value);
-	buffer.putInt(this.userID);
-	buffer.flip();
-	value = null;
-	byte[] result = new byte[buffer.remaining()];
-	buffer.get(result);
-	return result;
+        buffer.clear();
+        byte[] value = this.userName.getBytes();
+        buffer.putInt(value.length);
+        buffer.put(value);
+        buffer.putInt(this.userID);
+        buffer.flip();
+        value = null;
+        byte[] result = new byte[buffer.remaining()];
+        buffer.get(result);
+        return result;
     }
 }

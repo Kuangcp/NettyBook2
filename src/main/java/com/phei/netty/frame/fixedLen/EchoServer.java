@@ -30,52 +30,43 @@ import io.netty.handler.logging.LoggingHandler;
 
 /**
  * @author lilinfeng
- * @date 2014年2月14日
  * @version 1.0
+ * @date 2014年2月14日
  */
 public class EchoServer {
     public void bind(int port) throws Exception {
-	// 配置服务端的NIO线程组
-	EventLoopGroup bossGroup = new NioEventLoopGroup();
-	EventLoopGroup workerGroup = new NioEventLoopGroup();
-	try {
-	    ServerBootstrap b = new ServerBootstrap();
-	    b.group(bossGroup, workerGroup)
-		    .channel(NioServerSocketChannel.class)
-		    .option(ChannelOption.SO_BACKLOG, 100)
-		    .handler(new LoggingHandler(LogLevel.INFO))
-		    .childHandler(new ChannelInitializer<SocketChannel>() {
-			@Override
-			public void initChannel(SocketChannel ch)
-				throws Exception {
-			    ch.pipeline().addLast(
-				    new FixedLengthFrameDecoder(20));
-			    ch.pipeline().addLast(new StringDecoder());
-			    ch.pipeline().addLast(new EchoServerHandler());
-			}
-		    });
+        // 配置服务端的NIO线程组
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        try {
+            ServerBootstrap b = new ServerBootstrap();
+            b.group(bossGroup, workerGroup)
+                .channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_BACKLOG, 100)
+                .handler(new LoggingHandler(LogLevel.INFO))
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    public void initChannel(SocketChannel ch) {
+                        // 增加解码器 设定 定长的长度
+                        ch.pipeline().addLast(new FixedLengthFrameDecoder(20));
+                        ch.pipeline().addLast(new StringDecoder());
+                        ch.pipeline().addLast(new EchoServerHandler());
+                    }
+                });
 
-	    // 绑定端口，同步等待成功
-	    ChannelFuture f = b.bind(port).sync();
+            // 绑定端口，同步等待成功
+            ChannelFuture f = b.bind(port).sync();
 
-	    // 等待服务端监听端口关闭
-	    f.channel().closeFuture().sync();
-	} finally {
-	    // 优雅退出，释放线程池资源
-	    bossGroup.shutdownGracefully();
-	    workerGroup.shutdownGracefully();
-	}
+            // 等待服务端监听端口关闭
+            f.channel().closeFuture().sync();
+        } finally {
+            // 优雅退出，释放线程池资源
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
+        }
     }
 
     public static void main(String[] args) throws Exception {
-	int port = 8080;
-	if (args != null && args.length > 0) {
-	    try {
-		port = Integer.valueOf(args[0]);
-	    } catch (NumberFormatException e) {
-		// 采用默认值
-	    }
-	}
-	new EchoServer().bind(port);
+        new EchoServer().bind(8081);
     }
 }

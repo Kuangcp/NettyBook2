@@ -40,13 +40,12 @@ public class TimeClientHandler extends ChannelHandlerAdapter {
      * Creates a client-side handler.
      */
     public TimeClientHandler() {
-        req = ("QUERY TIME ORDER" + System.getProperty("line.separator"))
-                .getBytes();
+        req = ("QUERY TIME ORDER" + System.getProperty("line.separator")).getBytes();
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        ByteBuf message = null;
+        ByteBuf message;
         for (int i = 0; i < 100; i++) {
             message = Unpooled.buffer(req.length);
             message.writeBytes(req);
@@ -55,11 +54,10 @@ public class TimeClientHandler extends ChannelHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg)
-            throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        // 相比于没有使用解码器, 也是简化了很多
         String body = (String) msg;
-        System.out.println("Now is : " + body + " ; the counter is : "
-                + ++counter);
+        System.out.println("Now is : " + body + " ; the counter is : " + ++counter);
     }
 
     @Override

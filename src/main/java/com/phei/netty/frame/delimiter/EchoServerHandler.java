@@ -23,8 +23,8 @@ import io.netty.channel.ChannelHandlerContext;
 
 /**
  * @author lilinfeng
- * @date 2014年2月14日
  * @version 1.0
+ * @date 2014年2月14日
  */
 @Sharable
 public class EchoServerHandler extends ChannelHandlerAdapter {
@@ -32,19 +32,18 @@ public class EchoServerHandler extends ChannelHandlerAdapter {
     int counter = 0;
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg)
-	    throws Exception {
-	String body = (String) msg;
-	System.out.println("This is " + ++counter + " times receive client : ["
-		+ body + "]");
-	body += "$_";
-	ByteBuf echo = Unpooled.copiedBuffer(body.getBytes());
-	ctx.writeAndFlush(echo);
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        String body = (String) msg;
+        // 因为分隔符被DelimiterBaseFrameDecoder解码后就丢掉了, 所以需要手动加回去, 然后发送给客户端 才能让客户端正确的解码
+        System.out.println("This is " + ++counter + " times receive client : [" + body + "]");
+        body += " callback $_";
+        ByteBuf echo = Unpooled.copiedBuffer(body.getBytes());
+        ctx.writeAndFlush(echo);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-	cause.printStackTrace();
-	ctx.close();// 发生异常，关闭链路
+        cause.printStackTrace();
+        ctx.close();// 发生异常，关闭链路
     }
 }
