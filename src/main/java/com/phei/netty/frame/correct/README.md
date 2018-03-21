@@ -1,4 +1,4 @@
-## 使用 LIneBasedFrameDecoder 解决粘包问题
+## 使用 LineBasedFrameDecoder 解决粘包问题
 
 1. 只需要在服务端和客户端的处理器前, 加上两个处理器 LineBasedFrameDecoder  StringDecoder 即可
 2. 然后在客户端和服务端的消息的接收方法处,能直接将msg Object对象强转为String, 因为已经解码了
