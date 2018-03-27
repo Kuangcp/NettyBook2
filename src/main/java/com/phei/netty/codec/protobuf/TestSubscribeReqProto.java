@@ -35,14 +35,13 @@ public class TestSubscribeReqProto {
     }
 
     /**
-     * 解码
+     * 解码 字节数组转对象
      */
     private static SubscribeReqProto.SubscribeReq decode(byte[] body) throws InvalidProtocolBufferException {
         return SubscribeReqProto.SubscribeReq.parseFrom(body);
     }
-
+    // 创建一个构建器, 构建好对象
     private static SubscribeReqProto.SubscribeReq createSubscribeReq() {
-        // 创建一个构建器, 构建好对象
         SubscribeReqProto.SubscribeReq.Builder builder = SubscribeReqProto.SubscribeReq.newBuilder();
         builder.setSubReqID(1);
         builder.setUserName("Lilinfeng");
@@ -54,6 +53,10 @@ public class TestSubscribeReqProto {
         builder.addAllAddress(address);
         return builder.build();
     }
+
+    /**
+     * 测试使用 Protobuf 进行编解码 订阅请求对象
+     */
     public static void main(String[] args) throws InvalidProtocolBufferException {
         SubscribeReqProto.SubscribeReq req = createSubscribeReq();
         System.out.println("Before encode : " + req.toString());
