@@ -71,6 +71,7 @@ public class SubReqClient {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
+        String a = "fd";
         new SubReqClient().connect(8090, "127.0.0.1");
     }
 }
