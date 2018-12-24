@@ -32,46 +32,46 @@ import io.netty.handler.logging.LoggingHandler;
 /**
  * @author lilinfeng
  * @version 1.0
- * @date 2014年2月14日
  */
 public class SubReqServer {
-    public void bind(int port) throws Exception {
-        // 配置服务端的NIO线程组
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-        try {
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .option(ChannelOption.SO_BACKLOG, 100)
-                    .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        public void initChannel(SocketChannel ch) {
-                            // 添加Protobuf解码器, 并传入参数, 说明需要解码的目标类是什么, 否则是不会知道应该从字节数组中获取什么类型信息
-                            // 服务端需要解码的是请求对象
-                            ch.pipeline().addLast(new ProtobufDecoder(
-                                    SubscribeReqProto.SubscribeReq.getDefaultInstance()));
-                            // 半包解码器
-                            ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
-                            ch.pipeline().addLast(new ProtobufEncoder());
-                            ch.pipeline().addLast(new SubReqServerHandler());
-                        }
-                    });
 
-            // 绑定端口，同步等待成功
-            ChannelFuture f = b.bind(port).sync();
+  public void bind(int port) throws Exception {
+    // 配置服务端的NIO线程组
+    EventLoopGroup bossGroup = new NioEventLoopGroup();
+    EventLoopGroup workerGroup = new NioEventLoopGroup();
+    try {
+      ServerBootstrap b = new ServerBootstrap();
+      b.group(bossGroup, workerGroup)
+          .channel(NioServerSocketChannel.class)
+          .option(ChannelOption.SO_BACKLOG, 100)
+          .handler(new LoggingHandler(LogLevel.INFO))
+          .childHandler(new ChannelInitializer<SocketChannel>() {
+            @Override
+            public void initChannel(SocketChannel ch) {
+              // 添加Protobuf解码器, 并传入参数, 说明需要解码的目标类是什么, 否则是不会知道应该从字节数组中获取什么类型信息
+              // 服务端需要解码的是请求对象
+              ch.pipeline().addLast(new ProtobufDecoder(
+                  SubscribeReqProto.SubscribeReq.getDefaultInstance()));
+              // 半包解码器
+              ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
+              ch.pipeline().addLast(new ProtobufEncoder());
+              ch.pipeline().addLast(new SubReqServerHandler());
+            }
+          });
 
-            // 等待服务端监听端口关闭
-            f.channel().closeFuture().sync();
-        } finally {
-            // 优雅退出，释放线程池资源
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
+      // 绑定端口，同步等待成功
+      ChannelFuture f = b.bind(port).sync();
+
+      // 等待服务端监听端口关闭
+      f.channel().closeFuture().sync();
+    } finally {
+      // 优雅退出，释放线程池资源
+      bossGroup.shutdownGracefully();
+      workerGroup.shutdownGracefully();
     }
+  }
 
-    public static void main(String[] args) throws Exception {
-        new SubReqServer().bind(8090);
-    }
+  public static void main(String[] args) throws Exception {
+    new SubReqServer().bind(8090);
+  }
 }

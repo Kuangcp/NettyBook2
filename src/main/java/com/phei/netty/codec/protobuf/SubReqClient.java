@@ -31,47 +31,44 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 /**
  * @author lilinfeng
  * @version 1.0
- * @date 2014年2月14日
  */
 public class SubReqClient {
 
-    public void connect(int port, String host) throws Exception {
-        // 配置客户端NIO线程组
-        EventLoopGroup group = new NioEventLoopGroup();
-        try {
-            Bootstrap b = new Bootstrap();
-            b.group(group).channel(NioSocketChannel.class)
-                    .option(ChannelOption.TCP_NODELAY, true)
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        public void initChannel(SocketChannel ch)
-                                throws Exception {
-                            ch.pipeline().addLast(new ProtobufVarint32FrameDecoder());
-                            // 客户端需要解码的是回应对象
-                            ch.pipeline().addLast(new ProtobufDecoder(
-                                            SubscribeRespProto.SubscribeResp.getDefaultInstance()));
-                            ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
-                            ch.pipeline().addLast(new ProtobufEncoder());
-                            ch.pipeline().addLast(new SubReqClientHandler());
-                        }
-                    });
+  public void connect(int port, String host) throws Exception {
+    // 配置客户端NIO线程组
+    EventLoopGroup group = new NioEventLoopGroup();
+    try {
+      Bootstrap b = new Bootstrap();
+      b.group(group).channel(NioSocketChannel.class)
+          .option(ChannelOption.TCP_NODELAY, true)
+          .handler(new ChannelInitializer<SocketChannel>() {
+            @Override
+            public void initChannel(SocketChannel ch) throws Exception {
+              ch.pipeline().addLast(new ProtobufVarint32FrameDecoder());
+              // 客户端需要解码的是回应对象
+              ch.pipeline().addLast(new ProtobufDecoder(
+                  SubscribeRespProto.SubscribeResp.getDefaultInstance()));
+              ch.pipeline().addLast(new ProtobufVarint32LengthFieldPrepender());
+              ch.pipeline().addLast(new ProtobufEncoder());
+              ch.pipeline().addLast(new SubReqClientHandler());
+            }
+          });
 
-            // 发起异步连接操作
-            ChannelFuture f = b.connect(host, port).sync();
-            // 当代客户端链路关闭
-            f.channel().closeFuture().sync();
-        } finally {
-            // 优雅退出，释放NIO线程组
-            group.shutdownGracefully();
-        }
+      // 发起异步连接操作
+      ChannelFuture f = b.connect(host, port).sync();
+      // 当代客户端链路关闭
+      f.channel().closeFuture().sync();
+    } finally {
+      // 优雅退出，释放NIO线程组
+      group.shutdownGracefully();
     }
+  }
 
-    /**
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-        String a = "fd";
-        new SubReqClient().connect(8090, "127.0.0.1");
-    }
+  /**
+   *
+   */
+  public static void main(String[] args) throws Exception {
+    String a = "fd";
+    new SubReqClient().connect(8090, "127.0.0.1");
+  }
 }
