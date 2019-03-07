@@ -29,55 +29,53 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 
 /**
  * @author lilinfeng
- * @date 2014年2月14日
  * @version 1.0
  */
 public class SubReqClient {
 
-    public void connect(int port, String host) throws Exception {
-	// 配置客户端NIO线程组
-	EventLoopGroup group = new NioEventLoopGroup();
-	try {
-	    Bootstrap b = new Bootstrap();
-	    b.group(group).channel(NioSocketChannel.class)
-		    .option(ChannelOption.TCP_NODELAY, true)
-		    .handler(new ChannelInitializer<SocketChannel>() {
-			@Override
-			public void initChannel(SocketChannel ch)
-				throws Exception {
-			    ch.pipeline().addLast(
-				    new ObjectDecoder(1024, ClassResolvers
-					    .cacheDisabled(this.getClass()
-						    .getClassLoader())));
-			    ch.pipeline().addLast(new ObjectEncoder());
-			    ch.pipeline().addLast(new SubReqClientHandler());
-			}
-		    });
+  public void connect(int port, String host) throws Exception {
+    // 配置客户端NIO线程组
+    EventLoopGroup group = new NioEventLoopGroup();
+    try {
+      Bootstrap b = new Bootstrap();
+      b.group(group).channel(NioSocketChannel.class)
+          .option(ChannelOption.TCP_NODELAY, true)
+          .handler(new ChannelInitializer<SocketChannel>() {
+            @Override
+            public void initChannel(SocketChannel ch)
+                throws Exception {
+              ch.pipeline().addLast(
+                  new ObjectDecoder(1024, ClassResolvers
+                      .cacheDisabled(this.getClass()
+                          .getClassLoader())));
+              ch.pipeline().addLast(new ObjectEncoder());
+              ch.pipeline().addLast(new SubReqClientHandler());
+            }
+          });
 
-	    // 发起异步连接操作
-	    ChannelFuture f = b.connect(host, port).sync();
+      // 发起异步连接操作
+      ChannelFuture f = b.connect(host, port).sync();
 
-	    // 当代客户端链路关闭
-	    f.channel().closeFuture().sync();
-	} finally {
-	    // 优雅退出，释放NIO线程组
-	    group.shutdownGracefully();
-	}
+      // 当代客户端链路关闭
+      f.channel().closeFuture().sync();
+    } finally {
+      // 优雅退出，释放NIO线程组
+      group.shutdownGracefully();
     }
+  }
 
-    /**
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-	int port = 8080;
-	if (args != null && args.length > 0) {
-	    try {
-		port = Integer.valueOf(args[0]);
-	    } catch (NumberFormatException e) {
-		// 采用默认值
-	    }
-	}
-	new SubReqClient().connect(port, "127.0.0.1");
+  /**
+   *
+   */
+  public static void main(String[] args) throws Exception {
+    int port = 8080;
+    if (args != null && args.length > 0) {
+      try {
+        port = Integer.valueOf(args[0]);
+      } catch (NumberFormatException e) {
+        // 采用默认值
+      }
     }
+    new SubReqClient().connect(port, "127.0.0.1");
+  }
 }
